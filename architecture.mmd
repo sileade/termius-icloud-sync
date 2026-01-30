@@ -1,0 +1,26 @@
+graph TD
+    subgraph Пользователь
+        A[SSH Config в iCloud Drive<br/>~/.ssh/config -> iCloud]
+    end
+
+    subgraph "Скрипт 1: iCloud → Termius (Автоматически)"
+        B(launchd) -- запускает --> C{termius-import-from-icloud.sh}
+        A -- читает --> C
+        C -- "фильтрует '# termius:ignore'" --> D[Временный config]
+        D -- импортирует --> E(Termius CLI)
+        E -- termius import-ssh-config --> F[Локальное хранилище Termius]
+        F -- termius push --> G[Облако Termius]
+    end
+
+    subgraph "Скрипт 2: Termius → iCloud (Вручную)"
+        H{termius-export-to-icloud.sh} -- запускается пользователем --> I
+        I(Termius CLI) -- termius pull --> J[Локальное хранилище Termius]
+        J -- termius export-ssh-config --> K[Экспортированный config]
+        A -- создает бэкап --> L[Backup файла]
+        A -- "извлекает '# termius:ignore'" --> M[Игнорируемые хосты]
+        K & M -- объединяются --> N[Новый объединенный config]
+        N -- перезаписывает --> A
+    end
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style G fill:#f9f,stroke:#333,stroke-width:2px

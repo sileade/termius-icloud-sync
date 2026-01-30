@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+    com.user.termius-import.plist
+    
+    LaunchAgent для автоматического импорта SSH-конфига из iCloud в Termius.
+    Запускается при изменении файла конфига в iCloud и периодически.
+    
+    Установка:
+        cp com.user.termius-import.plist ~/Library/LaunchAgents/
+        launchctl load ~/Library/LaunchAgents/com.user.termius-import.plist
+    
+    Удаление:
+        launchctl unload ~/Library/LaunchAgents/com.user.termius-import.plist
+        rm ~/Library/LaunchAgents/com.user.termius-import.plist
+    
+    Проверка статуса:
+        launchctl list | grep termius-import
+    
+    Ручной запуск:
+        launchctl start com.user.termius-import
+    -->
+    
+    <!-- Уникальный идентификатор задачи -->
+    <key>Label</key>
+    <string>com.user.termius-import</string>
+    
+    <!-- Скрипт для выполнения -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <!-- 
+        ВАЖНО: Замените путь на актуальный путь к скрипту после установки.
+        По умолчанию: ~/.local/bin/termius-import-from-icloud.sh
+        -->
+        <string>$HOME/.local/bin/termius-import-from-icloud.sh</string>
+    </array>
+    
+    <!-- Переменные окружения -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- Путь к SSH config в iCloud (настройте под свою структуру) -->
+        <key>ICLOUD_SSH_CONFIG</key>
+        <string>~/Library/Mobile Documents/com~apple~CloudDocs/SSH/config</string>
+        
+        <!-- Путь к локальному SSH config -->
+        <key>LOCAL_SSH_CONFIG</key>
+        <string>~/.ssh/config</string>
+        
+        <!-- Директория для логов -->
+        <key>LOG_DIR</key>
+        <string>~/.local/log/termius-sync</string>
+        
+        <!-- PATH для доступа к termius CLI -->
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin</string>
+    </dict>
+    
+    <!-- Запуск при изменении файла в iCloud -->
+    <key>WatchPaths</key>
+    <array>
+        <!-- 
+        ВАЖНО: Замените на актуальный путь к вашему SSH config в iCloud.
+        Примеры:
+        - ~/Library/Mobile Documents/com~apple~CloudDocs/SSH/config
+        - ~/Library/Mobile Documents/com~apple~CloudDocs/.ssh/config
+        -->
+        <string>~/Library/Mobile Documents/com~apple~CloudDocs/SSH/config</string>
+    </array>
+    
+    <!-- Периодический запуск каждые 30 минут (1800 секунд) -->
+    <key>StartInterval</key>
+    <integer>1800</integer>
+    
+    <!-- Запускать при загрузке системы -->
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <!-- Перенаправление stdout в лог-файл -->
+    <key>StandardOutPath</key>
+    <string>~/.local/log/termius-sync/launchd-import.log</string>
+    
+    <!-- Перенаправление stderr в лог-файл -->
+    <key>StandardErrorPath</key>
+    <string>~/.local/log/termius-sync/launchd-import-error.log</string>
+    
+    <!-- Рабочая директория -->
+    <key>WorkingDirectory</key>
+    <string>~</string>
+    
+    <!-- Низкий приоритет для фоновой задачи -->
+    <key>LowPriorityIO</key>
+    <true/>
+    
+    <!-- Не перезапускать при ошибке сразу -->
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+    
+    <!-- Таймаут выполнения (5 минут) -->
+    <key>TimeOut</key>
+    <integer>300</integer>
+    
+    <!-- Запускать только когда пользователь залогинен -->
+    <key>LimitLoadToSessionType</key>
+    <string>Aqua</string>
+    
+</dict>
+</plist>
