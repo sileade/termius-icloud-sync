@@ -1,0 +1,53 @@
+# Global settings
+AddKeysToAgent yes
+IdentityFile ~/.ssh/id_ed25519
+
+# Production server - should be imported
+Host prod-web-01
+    HostName 10.0.1.10
+    User deploy
+    Port 22
+    IdentityFile ~/.ssh/prod_key
+
+# Development server - should be imported
+Host dev-api
+    HostName 192.168.1.50
+    User developer
+    ForwardAgent yes
+
+# Local development - should be IGNORED
+Host local-docker
+    # termius:ignore
+    HostName localhost
+    Port 2222
+    User root
+
+# Kubernetes cluster - should be imported
+Host k8s-master
+    HostName 10.0.2.1
+    User admin
+    ProxyJump bastion
+
+# Secret bastion - should be IGNORED
+Host secret-bastion
+    # termius:ignore
+    HostName 192.168.100.1
+    User admin
+    IdentityFile ~/.ssh/secret_key
+
+# Staging server - should be imported
+Host staging-app
+    HostName staging.example.com
+    User deploy
+    Port 2222
+
+# Another ignored host at the end - should be IGNORED
+Host temp-test-machine
+    # termius:ignore
+    HostName 10.10.10.10
+    User test
+
+# Wildcard host - should be imported
+Host *.example.com
+    User default_user
+    IdentityFile ~/.ssh/example_key
